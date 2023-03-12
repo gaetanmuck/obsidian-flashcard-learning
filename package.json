@@ -1,15 +1,15 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
-	"main": "main.js",
+	"name": "obsidian-flashcard-learning",
+	"version": "0.0.1",
+	"description": "This is a pluggin that implements how I would like to use flashcards inside Obsidian in order to learn and remember things.",
+	"main": "/src/main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
 	"keywords": [],
-	"author": "",
+	"author": "Gaétan Muck",
 	"license": "MIT",
 	"devDependencies": {
 		"@types/node": "^16.11.6",

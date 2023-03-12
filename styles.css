@@ -1,8 +1,195 @@
-/*
+.box{
+    border: 1px solid var(--background-modifier-border);
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.row-space-between {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
 
-If your plugin does not need CSS, delete this file.
+.row-space-around {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
 
-*/
+.row-center {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.col-start {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+}
+
+.col-space-between {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.col-space-around {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.col-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.flex-grow {
+    flex-grow: 1;
+}
+
+
+.p-5px {
+    padding: 5px;
+}
+
+.p-10px {
+    padding: 10px;
+}
+
+.p-30px {
+    padding: 30px;
+}
+
+.p-x-30px {
+    padding-right: 30px;
+    padding-left: 30px;
+}
+
+.p-l-30px {
+    padding-left: 30px;
+}
+
+.p-y-10px {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.p-y-30px {
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.m-y-10px {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.m-x-33pct {
+    margin-right: 33%;
+    margin-left: 33%;
+}
+
+.w-33pct {
+    width: 33%;
+}
+
+.w-50pct {
+    width: 50%;
+}
+
+.w-70pct {
+    width: 70%;
+}
+
+.w-80pct {
+    width: 80%;
+}
+
+.w-100pct {
+    width: 100%;
+}
+
+.h-20pct {
+    height: 20%;
+}
+
+.h-10pct {
+    height: 10%;
+}
+
+.h-30pct {
+    height: 30%;
+}
+
+.h-80pct {
+    height: 80%;
+}
+
+.h-90pct {
+    height: 90%;
+}
+
+.h-100pct {
+    height: 100%;
+}
+
+.h-200px {
+    height: 200px;
+}
+
+.h-750px {
+    height: 750px;
+}
+
+
+.max-w-33pct {
+    max-width: 33%;
+}
+
+.max-w-500px {
+    max-width: 500px;
+}
+
+
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block;
+}
+
+
+.nowrap {
+    white-space: nowrap ;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bg-red {
+    background-color: #d72503 !important;
+}
+
+.bg-green {
+    background-color: #1fae51 !important;
+}
+
+.txt-dark {
+    color: #23272b;
+}
+
+.txt-bold {
+    font-weight: bold;
+}
+
+.disable {
+    disabled: true
+}
+
+.invisible {
+    visibility: hidden;
+}

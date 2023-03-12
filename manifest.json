@@ -1,11 +1,11 @@
 {
-	"id": "obsidian-sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.0",
+	"id": "obsidian-flashcard-learning",
+	"name": "Flashcard learning",
+	"version": "0.0.1",
 	"minAppVersion": "0.15.0",
-	"description": "This is a sample plugin for Obsidian. This plugin demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"description": "This is a pluggin that implements how I would like to use flashcards inside Obsidian in order to learn and remember things.",
+	"author": "Gaétan Muck",
+	"authorUrl": "https://github.com/gaetanmuck",
+	"fundingUrl": "",
 	"isDesktopOnly": false
 }
