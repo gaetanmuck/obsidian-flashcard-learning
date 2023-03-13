@@ -108,7 +108,7 @@ export class HomeModal extends Modal {
 				lines.forEach(async (line, i) => {
 					if (line.startsWith('FLASHCARD')) {
 						const result = Flashcard.fromString(file, i, this.plugin.settings.decks, line)
-						if (result) {
+						if (!result.malformed) {
 							this.flashcards.push(result)
 							if (result.deck.name == 'No deck') lines[i] = result.toString();
 						}

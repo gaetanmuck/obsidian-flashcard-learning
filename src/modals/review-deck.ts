@@ -65,16 +65,10 @@ export class ReviewDeckModal extends Modal {
 
         this.initGlobalContainer();
 
-        console.log('======', this.queue.length);
-        this.queue.forEach(fc => console.log(fc.toString()));
-
-
         if (this.queue.length == 0) {
 
             // Save the deck's progress
             this.decks.forEach(deck => deck.reviewIndex++);
-            console.log(this.decks)
-            console.log(this.plugin.settings);
             this.plugin.saveData(this.plugin.settings);
 
             // Congratulation container
@@ -104,6 +98,8 @@ export class ReviewDeckModal extends Modal {
 
         const flashcard = this.queue[0];
 
+        console.log(flashcard)
+
 
         // Flashcard information
 
@@ -123,19 +119,37 @@ export class ReviewDeckModal extends Modal {
         // Front side
 
         const front = this.container.createDiv();
-        front.addClasses(['col-center', 'w-100pct', 'flex-grow', 'box', 'm-y-10px'])
-        const front_row = front.createDiv()
-        front_row.addClasses(['row-center', 'w-100pct'])
-        front_row.createSpan({ text: flashcard.recto })
+        front.addClasses(['col-space-between', 'w-100pct', 'flex-grow', 'box', 'm-y-10px'])
+
+        const front_row_desc = front.createDiv()
+        front_row_desc.addClasses(['row-start', 'w-100pct', 'p-10px'])
+        front_row_desc.createSpan({ text: flashcard.rectoDesc + ':' })
+
+        const front_row_content = front.createDiv()
+        front_row_content.addClasses(['row-center', 'w-100pct'])
+        front_row_content.createSpan({ text: flashcard.recto })
+
+        const front_placeholder = front.createDiv()
+        front_placeholder.addClasses(['p-10px', 'invisible'])
+        front_placeholder.createSpan({ text: 'placeholder'})
 
 
         // Back side
 
         const back = this.container.createDiv();
-        back.addClasses(['col-center', 'w-100pct', 'flex-grow', 'box', 'm-y-10px'])
-        const back_row = back.createDiv()
-        back_row.addClasses(['row-center', 'w-100pct'])
-        let answer = back_row.createSpan({ text: '❓' })
+        back.addClasses(['col-space-between', 'w-100pct', 'flex-grow', 'box', 'm-y-10px'])
+
+        const back_row_desc = back.createDiv()
+        back_row_desc.addClasses(['row-start', 'w-100pct', 'p-10px'])
+        back_row_desc.createSpan({ text: flashcard.versoDesc + ':' })
+
+        const back_row_content = back.createDiv()
+        back_row_content.addClasses(['row-center', 'w-100pct'])
+        let answer = back_row_content.createSpan({ text: '❓' })
+
+        const back_placeholder = back.createDiv()
+        back_placeholder.addClasses(['p-10px', 'invisible'])
+        back_placeholder.createSpan({ text: 'placeholder'})
 
 
         // Commands
@@ -149,7 +163,7 @@ export class ReviewDeckModal extends Modal {
         showAnswer.onClickEvent(() => {
             // Show answer
             answer.remove();
-            answer = back_row.createSpan({ text: flashcard.verso });
+            answer = back_row_content.createSpan({ text: flashcard.verso });
 
             // Hide Show button
             showAnswer.removeClass('visible');

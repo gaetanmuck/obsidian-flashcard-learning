@@ -113,12 +113,13 @@ export class FlashcardSettingTab extends PluginSettingTab {
             deckRow.addClasses(['row-space-around', 'w-100pct']);
 
 
-            let newName: boolean | string = false;
+            let newName: string = '';
             let deleteDeck = false;
             let resetProgress = false;
 
             new Setting(deckRow)
-                .setName('Deck ' + (i + 1) + ', reviewed: ' + deck.reviewIndex)
+                .setName('Deck ' + (i + 1))
+                .setDesc('Reviewed: ' + deck.reviewIndex)
 
                 // Deck name text field
                 .addText(text => text
@@ -149,54 +150,93 @@ export class FlashcardSettingTab extends PluginSettingTab {
                     })
                 )
 
-            // Save new name
-            // .addButton(button => button
-            //     .setButtonText('Save')
-            //     .setTooltip('Replace existing deck name through all flashcards')
-            //     .onClick(async () => {
-            //         // Fetch, update and write all Flascards in all files in an async and parallel way
-            //         await Promise.all(
-            //             this.plugin.app.vault.getMarkdownFiles().map(async file => {
-            //                 const lines = (await this.app.vault.read(file)).split('\n');
-            //                 let changeFound = false;
-            //                 lines.forEach((line, j) => {
-            //                     if (line.startsWith('FLASHCARD')) {
-            //                         const fc = Flashcard.fromString(file, j, this.plugin.settings.decks, line);
-            //                         if (fc.deck.name == this.plugin.settings.decks[i].name) {
-            //                             fc.deck.name = newName
-            //                             lines[j] = fc.toString();
-            //                             changeFound = true;
-            //                         }
-            //                     }
-            //                 })
-            //                 if (changeFound) this.plugin.app.vault.modify(file, lines.join('\n'));
-            //             })
-            //         )
-
-            //         // Update settings
-            //         this.plugin.settings.decks[i].name = newName
-            //         this.plugin.saveData(this.plugin.settings)
-            //     })
-            // )
-
             const saveButton = deckRow.createEl('button');
             saveButton.setText('Save')
             saveButton.toggleVisibility(false);
-            saveButton.onClickEvent(() => {
-                console.log('CLICK', Math.random())
+            saveButton.onClickEvent(async () => {
+                saveButton.disabled = true;
+
+                if (newName) await this.replaceDeckName(deck, newName);
+                if (deleteDeck) await this.deleteDeck(deck, i);
+                if (resetProgress) await this.resetProgress(deck);
+
+                saveButton.disabled = false;
+                saveButton.toggleVisibility(false);
             })
         })
     }
 
-    replaceDeckName(deck: Deck, newName: string) {
+    async replaceDeckName(deck:Deck, newName: string) {
+        // Fetch, update and write all Flascards in all files in an async and parallel way
+        await Promise.all(
+            this.plugin.app.vault.getMarkdownFiles().map(async file => {
+                const lines = (await this.app.vault.read(file)).split('\n');
+                let changeFound = false;
+                lines.forEach((line, j) => {
+                    if (line.startsWith('FLASHCARD')) {
+                        const fc = Flashcard.fromString(file, j, this.plugin.settings.decks, line);
+                        if (fc.deck == deck) {
+                            lines[j] = fc.toString().replace('FLASHCARD - ' + deck.name, 'FLASHCARD - ' + newName)
+                            changeFound = true;
+                        }
+                    }
+                })
+                if (changeFound) await this.plugin.app.vault.modify(file, lines.join('\n'));
+            })
+        )
 
+        // Update settings
+        deck.name = newName;
+        this.plugin.saveData(this.plugin.settings);
     }
 
-    deleteDeck(deck: Deck) {
+    async deleteDeck(deck: Deck, index: number) {
+        // Fetch, update and write all Flascards in all files in an async and parallel way
+        await Promise.all(
+            this.plugin.app.vault.getMarkdownFiles().map(async file => {
+                const lines = (await this.app.vault.read(file)).split('\n');
+                let changeFound = false;
+                lines.forEach((line, j) => {
+                    if (line.startsWith('FLASHCARD')) {
+                        const fc = Flashcard.fromString(file, j, this.plugin.settings.decks, line);
+                        if (fc.deck == deck) {
+                            lines[j] = fc.toString().replace('FLASHCARD - ' + deck.name, 'FLASHCARD - No Deck')
+                            changeFound = true;
+                        }
+                    }
+                })
+                if (changeFound) await this.plugin.app.vault.modify(file, lines.join('\n'));
+            })
+        )
 
+        // Update settings
+        this.plugin.settings.decks.splice(index, 1);
+        this.plugin.saveData(this.plugin.settings);
     }
 
-    resetProgress(deck: Deck) {
+    async resetProgress(deck: Deck) {
+        // Fetch, update and write all Flascards in all files in an async and parallel way
+        await Promise.all(
+            this.plugin.app.vault.getMarkdownFiles().map(async file => {
+                const lines = (await this.app.vault.read(file)).split('\n');
+                let changeFound = false;
+                lines.forEach((line, j) => {
+                    if (line.startsWith('FLASHCARD')) {
+                        const fc = Flashcard.fromString(file, j, this.plugin.settings.decks, line);
+                        if (fc.deck === deck) {
+                            fc.reviewIndex = 0;
+                            fc.level = 0;
+                            lines[j] = fc.toString();
+                            changeFound = true;
+                        }
+                    }
+                })
+                if (changeFound) await this.plugin.app.vault.modify(file, lines.join('\n'));
+            })
+        )
 
+        // Update settings
+        deck.reviewIndex = 0;
+        this.plugin.saveData(this.plugin.settings);
     }
 }

@@ -2,6 +2,12 @@
     border: 1px solid var(--background-modifier-border);
 }
 
+.row-start {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+}
+
 .row-space-between {
     display: flex;
     flex-direction: row;
@@ -184,10 +190,6 @@
 
 .txt-bold {
     font-weight: bold;
-}
-
-.disable {
-    disabled: true
 }
 
 .invisible {

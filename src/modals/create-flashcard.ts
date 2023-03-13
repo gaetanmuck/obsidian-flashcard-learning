@@ -10,7 +10,9 @@ export class CreateFlashcardModal extends Modal {
 	lineNb: number;
 	deck: Deck;
 	side1: string;
+	side1Desc: string;
 	side2: string;
+	side2Desc: string;
 	level: number;
 	onSubmit: (fc1: Flashcard, fc2: Flashcard) => void
 
@@ -37,10 +39,21 @@ export class CreateFlashcardModal extends Modal {
 				dropdown.onChange(value => this.deck = this.settings.decks[parseInt(value)])
 			})
 
+
+		// Side 1 Description Text field
+		new Setting(contentEl)
+			.setName("Side 1 description")
+			.addText(text => text.onChange(value => this.side1Desc = value))
+
 		// Side 1 Text field
 		new Setting(contentEl)
 			.setName("Side 1")
 			.addText(text => text.onChange(value => this.side1 = value))
+
+		// Side 2 Description Text field
+		new Setting(contentEl)
+			.setName("Side 2 description")
+			.addText(text => text.onChange(value => this.side2Desc = value))
 
 		// Side 2 Text field
 		new Setting(contentEl)
@@ -62,8 +75,8 @@ export class CreateFlashcardModal extends Modal {
 				.onClick(() => {
 					this.close();
 					this.onSubmit(
-						new Flashcard(this.deck, this.side1, this.side2, this.level),
-						new Flashcard(this.deck, this.side2, this.side1, this.level),
+						new Flashcard(this.deck, this.side1, this.side1Desc, this.side2, this.side2Desc, this.level),
+						new Flashcard(this.deck, this.side2, this.side2Desc, this.side1, this.side1Desc, this.level),
 					);
 				}))
 	}
