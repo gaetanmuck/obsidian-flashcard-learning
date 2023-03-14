@@ -7,9 +7,12 @@ import { HomeModal } from './home';
 export class ReviewDeckModal extends Modal {
 
     plugin: FlashcardLearningPlugin;
-    flashcards: Array<Flashcard> = [];
+    
     decks: Array<Deck> = [];
+    flashcards: Array<Flashcard> = [];
+
     queue: Array<Flashcard> = [];
+    
     container: HTMLDivElement;
 
 
@@ -17,7 +20,6 @@ export class ReviewDeckModal extends Modal {
         super(app);
         this.plugin = plugin;
         this.flashcards = allFlashcards;
-
 
         // Select all the concerned decks
         if (deckname == 'all') this.decks = this.plugin.settings.decks;
@@ -29,11 +31,12 @@ export class ReviewDeckModal extends Modal {
         this.modalEl.addClasses(['h-80pct', 'w-80pct', 'max-w-500px'])
     }
 
+
     onOpen() {
 
-        // Find the Flashcards
+        // Find the deck's Flashcards
         for (const deck of this.decks) {
-            const selection = this.flashcards.filter(fc => fc.deck.name == deck.name);
+            const selection = this.flashcards.filter(fc => fc.deck == deck);
             this.queue = this.queue.concat(selection.filter(fc => fc.reviewIndex <= deck.reviewIndex));
         }
 
@@ -47,11 +50,15 @@ export class ReviewDeckModal extends Modal {
         this.displayNextFlashcard();
     }
 
+
     onClose() {
         const { contentEl } = this;
         contentEl.empty();
+
+        // Go back to home modal
         new HomeModal(this.app, this.plugin).open()
     }
+
 
     initGlobalContainer() {
         if (this.container) this.container.remove();
@@ -71,7 +78,7 @@ export class ReviewDeckModal extends Modal {
             this.decks.forEach(deck => deck.reviewIndex++);
             this.plugin.saveData(this.plugin.settings);
 
-            // Congratulation container
+            // Congratulation container, when a review went through, ie queue.length == 0
             const box = this.container.createDiv();
             box.addClasses(['col-space-around', 'w-100pct', 'h-100pct'])
 
@@ -96,9 +103,8 @@ export class ReviewDeckModal extends Modal {
         }
 
 
+        // The current flashcard to review
         const flashcard = this.queue[0];
-
-        console.log(flashcard)
 
 
         // Flashcard information
@@ -155,8 +161,6 @@ export class ReviewDeckModal extends Modal {
         // Commands
 
         const commands_container = this.container.createDiv();
-        // commands_container.addClasses(['row-space-around']);
-        commands_container.addClasses(['row-center']);
 
         const showAnswer = commands_container.createEl('button', { text: '👀 Show answer' });
         showAnswer.addClasses(['w-33pct', 'txt-bold', 'visible'])
@@ -170,7 +174,7 @@ export class ReviewDeckModal extends Modal {
             showAnswer.addClass('hidden');
             commands_container.removeClass('row-center');
 
-            // Show responses buttons
+            // Show response buttons
             wrongBtn.removeClass('hidden');
             wrongBtn.addClass('visible');
             correcBtn.removeClass('hidden');
@@ -182,6 +186,8 @@ export class ReviewDeckModal extends Modal {
         wrongBtn.addClasses(['w-33pct', 'bg-red', 'txt-bold', 'hidden'])
         wrongBtn.onClickEvent(() => {
             flashcard.wasWrong(this.app.vault);
+
+            // When a card is wrong, put it again in the queue, wrongStepBack behind
             this.queue.splice(this.plugin.settings.wrongStepBack, 0, flashcard);
             this.queue.shift();
             this.displayNextFlashcard();
@@ -191,6 +197,8 @@ export class ReviewDeckModal extends Modal {
         correcBtn.addClasses(['w-33pct', 'bg-green', 'txt-dark', 'txt-bold', 'hidden']);
         correcBtn.onClickEvent(() => {
             flashcard.wasCorrect(this.app.vault);
+
+            // When answer was correct, remove it from queue
             this.queue.shift();
             this.displayNextFlashcard();
         })

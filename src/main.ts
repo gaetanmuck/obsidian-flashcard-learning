@@ -2,10 +2,12 @@ import { Plugin, Editor, MarkdownView } from 'obsidian'
 import { CreateFlashcardModal } from './modals/create-flashcard';
 import { HomeModal } from './modals/home';
 import { Flashcard } from './model/flashcard';
-import { DEFAULT_SETTINGS, FlashcardLearningSettings, FlashcardSettingTab } from './settings';
+import { FlashcardLearningSettings } from './model/settings';
+import { DEFAULT_SETTINGS, FlashcardSettingTab } from './settings';
 
 
 export default class FlashcardLearningPlugin extends Plugin {
+    
     settings: FlashcardLearningSettings
 
     async onload() {

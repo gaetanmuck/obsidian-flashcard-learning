@@ -2,24 +2,15 @@ import { App, PluginSettingTab, Setting } from 'obsidian';
 import { Deck } from './model/deck';
 import FlashcardLearningPlugin from './main';
 import { Flashcard } from './model/flashcard';
-import MyPlugin from 'main_old';
-
-
-export interface FlashcardLearningSettings {
-    defaultLevel: number;
-    decks: Array<Deck>;
-    wrongStepBack: number;
-    side1_int: string | undefined;
-    side2_int: string | undefined;
-}
+import { FlashcardLearningSettings } from './model/settings';
+import { ConfirmModal } from './modals/confirm';
+import { updateFlashcards } from './tools';
 
 
 export const DEFAULT_SETTINGS: FlashcardLearningSettings = {
     defaultLevel: 0,
     decks: [new Deck('No deck')],
-    wrongStepBack: 5,
-    side1_int: undefined,
-    side2_int: undefined
+    wrongStepBack: 5
 }
 
 
@@ -39,28 +30,37 @@ export class FlashcardSettingTab extends PluginSettingTab {
         // Title
         containerEl.createEl('h1', { text: 'Flashcard Learning settings' });
 
-        // Progress 
+        // Reset progress 
         new Setting(containerEl)
             .setName('Reset all progress')
-            .setDesc('Be carefull, this action will erase all levels, and all progress you have on this vault')
+            .setDesc('Be carefull, this action will erase all levels, and all progress you have in this vault')
             .addButton(button => button
                 .setButtonText('Reset learning')
                 .setCta()
                 .onClick(() => {
-                    // Fetch, update and write all Flascards in all files in an async and parallel way
-                    this.plugin.app.vault.getMarkdownFiles().map(async file => {
-                        const lines = (await this.app.vault.read(file)).split('\n');
-                        lines.forEach((line, i) => {
-                            if (line.startsWith('FLASHCARD')) {
-                                const fc = Flashcard.fromString(file, i, this.plugin.settings.decks, line);
-                                fc.reset();
-                                lines[i] = fc.toString();
-                            }
+                    // Goes through a confirmation modal
+                    new ConfirmModal(this.app, answer => {
+                        if (!answer) return;
+
+                        // Fetch, update and write all Flascards in all files in an async and parallel way
+                        this.plugin.app.vault.getMarkdownFiles().map(async file => {
+                            const lines = (await this.app.vault.read(file)).split('\n');
+                            let updated = false;
+                            lines.forEach((line, i) => {
+                                if (line.startsWith('FLASHCARD')) {
+                                    const fc = Flashcard.fromString(file, i, this.plugin.settings.decks, line);
+                                    fc.reset();
+                                    lines[i] = fc.toString();
+                                    updated = true;
+                                }
+                            })
+                            // We only write each file at most once, no need to rewrite for each updated flashcard
+                            if (updated) this.plugin.app.vault.modify(file, lines.join('\n'));
                         })
-                        this.plugin.app.vault.modify(file, lines.join('\n'));
-                    })
+                    }).open()
                 })
             )
+
 
         // Default level
         new Setting(containerEl)
@@ -70,6 +70,7 @@ export class FlashcardSettingTab extends PluginSettingTab {
                 .setPlaceholder('Set your level')
                 .setValue(this.plugin.settings.defaultLevel + '')
                 .onChange(async value => {
+                    // Save settings on change
                     this.plugin.settings.defaultLevel = isNaN(Number(value)) ? 0 : Number(value);
                     await this.plugin.saveData(this.plugin.settings);
                     this.display();
@@ -84,10 +85,12 @@ export class FlashcardSettingTab extends PluginSettingTab {
                 .setPlaceholder('Set your Wrong step back')
                 .setValue(this.plugin.settings.wrongStepBack + '')
                 .onChange(async value => {
+                    // Save settings on change
                     this.plugin.settings.wrongStepBack = isNaN(Number(value)) ? 0 : Number(value);
                     await this.plugin.saveData(this.plugin.settings);
                     this.display();
                 }));
+
 
         // New Decks
         new Setting(containerEl)
@@ -97,22 +100,23 @@ export class FlashcardSettingTab extends PluginSettingTab {
                 .setButtonText('Add a new deck')
                 .setCta()
                 .onClick(async () => {
+                    // Save settings on change: by default, just create a "New Deck". User has to update name to customize.
                     this.plugin.settings.decks.push(new Deck('New Deck'));
                     await this.plugin.saveData(this.plugin.settings);
                     this.display();
                 })
             )
 
-        const deckContainer = containerEl.createDiv();
-        deckContainer.addClasses(['p-l-30px', 'p-y-10px'])
-
         // Existing Decks
+        const decksContainer = containerEl.createDiv();
+        decksContainer.addClasses(['p-l-30px', 'p-y-10px'])
+
         this.plugin.settings.decks.forEach((deck, i) => {
 
-            const deckRow = deckContainer.createDiv()
+            const deckRow = decksContainer.createDiv()
             deckRow.addClasses(['row-space-around', 'w-100pct']);
 
-
+            // 'Witness' variables, to know if something has changed for each deck
             let newName: string = '';
             let deleteDeck = false;
             let resetProgress = false;
@@ -125,6 +129,7 @@ export class FlashcardSettingTab extends PluginSettingTab {
                 .addText(text => text
                     .setValue(deck.name)
                     .onChange(async value => {
+                        // On change, we allow user to save action
                         newName = value;
                         saveButton.toggleVisibility(true);
                     })
@@ -135,6 +140,7 @@ export class FlashcardSettingTab extends PluginSettingTab {
                     .setButtonText('Delete deck')
                     .setTooltip('Delete only the deck, not the flashcards (they will be set to \'No deck\')')
                     .onClick(() => {
+                        // On change, we allow user to save action
                         deleteDeck = true;
                         saveButton.toggleVisibility(true);
                     })
@@ -145,98 +151,63 @@ export class FlashcardSettingTab extends PluginSettingTab {
                     .setButtonText('Reset progress')
                     .setTooltip('Reset all progress')
                     .onClick(() => {
+                        // On change, we allow user to save action
                         resetProgress = true;
                         saveButton.toggleVisibility(true);
                     })
                 )
 
+
+            // When an action has been made on a deck, 
+            // First allow user to save his change,
+            // Then call the write function
             const saveButton = deckRow.createEl('button');
+            saveButton.addClasses(['bg-red'])
             saveButton.setText('Save')
-            saveButton.toggleVisibility(false);
+            saveButton.toggleVisibility(false); // By default, nothing has changed, so we keep button hidden
             saveButton.onClickEvent(async () => {
                 saveButton.disabled = true;
 
-                if (newName) await this.replaceDeckName(deck, newName);
-                if (deleteDeck) await this.deleteDeck(deck, i);
-                if (resetProgress) await this.resetProgress(deck);
+                // If name has changed
+                if (newName) {
+                    // Update flashcards
+                    await updateFlashcards(this.app.vault, this.plugin.settings.decks, deck, (fc: Flashcard) => {
+                        return fc.toString().replace('FLASHCARD - ' + deck.name, 'FLASHCARD - ' + newName)
+                    });
+
+                    // Update settings
+                    deck.name = newName;
+                    this.plugin.saveData(this.plugin.settings);
+                }
+
+                // If delete button has been clicked
+                if (deleteDeck) {
+                    // Update flashcards
+                    await updateFlashcards(this.app.vault, this.plugin.settings.decks, deck, (fc: Flashcard) => {
+                        return fc.toString().replace('FLASHCARD - ' + deck.name, 'FLASHCARD - No Deck')
+                    })
+
+                    // Update settings
+                    this.plugin.settings.decks.splice(i, 1);
+                    this.plugin.saveData(this.plugin.settings);
+                }
+
+                // If reset progress has been clicked
+                if (resetProgress) {
+                    // Update flashcards
+                    await updateFlashcards(this.app.vault, this.plugin.settings.decks, deck, (fc: Flashcard) => {
+                        fc.reset();
+                        return fc.toString();
+                    })
+
+                    // Update settings
+                    deck.reviewIndex = 0;
+                    this.plugin.saveData(this.plugin.settings);
+                }
 
                 saveButton.disabled = false;
                 saveButton.toggleVisibility(false);
             })
         })
-    }
-
-    async replaceDeckName(deck:Deck, newName: string) {
-        // Fetch, update and write all Flascards in all files in an async and parallel way
-        await Promise.all(
-            this.plugin.app.vault.getMarkdownFiles().map(async file => {
-                const lines = (await this.app.vault.read(file)).split('\n');
-                let changeFound = false;
-                lines.forEach((line, j) => {
-                    if (line.startsWith('FLASHCARD')) {
-                        const fc = Flashcard.fromString(file, j, this.plugin.settings.decks, line);
-                        if (fc.deck == deck) {
-                            lines[j] = fc.toString().replace('FLASHCARD - ' + deck.name, 'FLASHCARD - ' + newName)
-                            changeFound = true;
-                        }
-                    }
-                })
-                if (changeFound) await this.plugin.app.vault.modify(file, lines.join('\n'));
-            })
-        )
-
-        // Update settings
-        deck.name = newName;
-        this.plugin.saveData(this.plugin.settings);
-    }
-
-    async deleteDeck(deck: Deck, index: number) {
-        // Fetch, update and write all Flascards in all files in an async and parallel way
-        await Promise.all(
-            this.plugin.app.vault.getMarkdownFiles().map(async file => {
-                const lines = (await this.app.vault.read(file)).split('\n');
-                let changeFound = false;
-                lines.forEach((line, j) => {
-                    if (line.startsWith('FLASHCARD')) {
-                        const fc = Flashcard.fromString(file, j, this.plugin.settings.decks, line);
-                        if (fc.deck == deck) {
-                            lines[j] = fc.toString().replace('FLASHCARD - ' + deck.name, 'FLASHCARD - No Deck')
-                            changeFound = true;
-                        }
-                    }
-                })
-                if (changeFound) await this.plugin.app.vault.modify(file, lines.join('\n'));
-            })
-        )
-
-        // Update settings
-        this.plugin.settings.decks.splice(index, 1);
-        this.plugin.saveData(this.plugin.settings);
-    }
-
-    async resetProgress(deck: Deck) {
-        // Fetch, update and write all Flascards in all files in an async and parallel way
-        await Promise.all(
-            this.plugin.app.vault.getMarkdownFiles().map(async file => {
-                const lines = (await this.app.vault.read(file)).split('\n');
-                let changeFound = false;
-                lines.forEach((line, j) => {
-                    if (line.startsWith('FLASHCARD')) {
-                        const fc = Flashcard.fromString(file, j, this.plugin.settings.decks, line);
-                        if (fc.deck === deck) {
-                            fc.reviewIndex = 0;
-                            fc.level = 0;
-                            lines[j] = fc.toString();
-                            changeFound = true;
-                        }
-                    }
-                })
-                if (changeFound) await this.plugin.app.vault.modify(file, lines.join('\n'));
-            })
-        )
-
-        // Update settings
-        deck.reviewIndex = 0;
-        this.plugin.saveData(this.plugin.settings);
     }
 }

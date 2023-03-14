@@ -1,20 +1,23 @@
 import { Modal, App, Setting } from 'obsidian'
 import { Flashcard } from 'src/model/flashcard';
+import { FlashcardLearningSettings } from 'src/model/settings';
 import { Deck } from '../model/deck';
-import { FlashcardLearningSettings } from '../settings';
 
 
 export class CreateFlashcardModal extends Modal {
 
 	settings: FlashcardLearningSettings;
 	lineNb: number;
+	onSubmit: (fc1: Flashcard, fc2: Flashcard) => void
+	
+	// Modal fields
 	deck: Deck;
 	side1: string;
 	side1Desc: string;
 	side2: string;
 	side2Desc: string;
 	level: number;
-	onSubmit: (fc1: Flashcard, fc2: Flashcard) => void
+
 
 	constructor(app: App, settings: FlashcardLearningSettings, lineNb: number, onSubmit: (fc1: Flashcard, fc2: Flashcard) => void) {
 		super(app);
@@ -28,7 +31,6 @@ export class CreateFlashcardModal extends Modal {
 
 	onOpen() {
 		const { contentEl } = this;
-
 		contentEl.createEl("h1", { text: "Create new Flashcard" });
 
 		// Deck dropdown
@@ -38,7 +40,6 @@ export class CreateFlashcardModal extends Modal {
 				this.settings.decks.forEach((deck, i) => dropdown.addOption(i + '', deck.name))
 				dropdown.onChange(value => this.deck = this.settings.decks[parseInt(value)])
 			})
-
 
 		// Side 1 Description Text field
 		new Setting(contentEl)
@@ -60,14 +61,14 @@ export class CreateFlashcardModal extends Modal {
 			.setName("Side 2")
 			.addText(text => text.onChange(value => this.side2 = value))
 
-		// Level
+		// Level, only update when it is a number
 		new Setting(contentEl)
 			.setName("Level")
 			.addText(text => text
 				.setValue(this.settings.defaultLevel + '')
 				.onChange(value => this.level = Number(value) ?? this.settings.defaultLevel))
 
-		// Submit button
+		// Submit button: send back 2 news Flashcard (side1/side2 AND side2/side1)
 		new Setting(contentEl)
 			.addButton(btn => btn
 				.setButtonText("Create")

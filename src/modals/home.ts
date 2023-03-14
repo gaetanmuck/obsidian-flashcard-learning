@@ -7,7 +7,9 @@ import { ReviewDeckModal } from './review-deck';
 export class HomeModal extends Modal {
 
 	plugin: FlashcardLearningPlugin;
+
 	flashcards: Array<Flashcard>;
+
 
 	constructor(app: App, plugin: FlashcardLearningPlugin) {
 		super(app);
@@ -17,6 +19,8 @@ export class HomeModal extends Modal {
 	}
 
 	async onOpen() {
+
+		// Title and container
 		this.contentEl.createEl('h1', { text: "📚 Flashcard Learning" });
 		const container = this.contentEl.createDiv();
 		container.addClasses(['col-start'])
@@ -103,18 +107,30 @@ export class HomeModal extends Modal {
 		// Look for flashcards across the vault
 		this.flashcards = [];
 		await Promise.all(
+			// Go through all the files
 			this.app.vault.getMarkdownFiles().map(async file => {
+				// And each lines
 				const lines = (await this.app.vault.read(file)).split('\n');
+				let change = false;
 				lines.forEach(async (line, i) => {
+
+					// If the line has the correct begining, it is flashcard
 					if (line.startsWith('FLASHCARD')) {
-						const result = Flashcard.fromString(file, i, this.plugin.settings.decks, line)
-						if (!result.malformed) {
-							this.flashcards.push(result)
-							if (result.deck.name == 'No deck') lines[i] = result.toString();
+						const result = Flashcard.fromString(file, i, this.plugin.settings.decks, line);
+
+						// We only want the ones that are correct, and that have a deck
+						if (!result.malformed && result.deck.name != 'No deck') this.flashcards.push(result);
+
+						// If we find a malformed, the file is updated to let user know
+						if(result.malformed) {
+							lines[i] = result.toString();
+							change = true;
 						}
 					}
 				})
-				this.plugin.app.vault.modify(file, lines.join('\n'))
+				
+				// Only write changed files (because a malformed flashcard was found)
+				if (change) this.plugin.app.vault.modify(file, lines.join('\n'))
 			})
 		)
 	}
