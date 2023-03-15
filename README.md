@@ -23,7 +23,7 @@ Deck is parent of Flashcard. Each Flashcard should belong to one Deck.
 
 This is why, by default, all Flashcards belonging to the Deck « No Deck » will not be treated. If you have such cards in your vault, you should search with Obsidian the string « No deck » and replace them with the Deck you want to attribute them.
 
-How are those « No deck » card existing? If you delete a Deck via the plugin settings, and you still have card in that deck, rather to also delete the card with it, they will be changed to « No deck ». That is so to avoid to delete information to fast. Another possibility of having no deck is if you create card manually: it is possible to directly in your Obsidian notes to create Flashcard with the right syntax. Then, when the home modal will load (by pressing the book icon on the ribbon) it will parse all Flashcards and attribute « No deck » to all Flashcard with an non existing deck. 
+How are those « No deck » card existing? If you delete a Deck via the plugin settings, and you still have card in that deck, rather to also delete the card with it, they will be changed to « No deck ». That is so to avoid to delete information to fast. Another possibility of having « No deck » is if you create card manually: it is possible to directly, in your Obsidian notes, create Flashcard with the right syntax. Then, when the home modal will load (by pressing the book icon on the ribbon) it will parse all Flashcards and attribute « No deck » to all Flashcard with an non existing deck. 
 
 Each Deck has a review index that will be incremented each time you review it.
 
