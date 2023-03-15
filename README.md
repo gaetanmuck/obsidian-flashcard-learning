@@ -15,7 +15,7 @@ A Flashcard is made of:
 
 ### Review
 
-We call a review, a learning session in which you review a selection of flashcards due for this review. The review will not be finished until all cards are out of the queue (e.g. you answered « Correct » to all flashcards; otherwise the card stays in the queue), even if you take multiple days to go through. This being said, you also can have multiple reviews in a single days. Actually, this plugin does not look at dates and time, but only on review indexes. That is why when you answer « Correct » you will not see the card again in x days, but rather in x reviews.
+A review, is a learning session in which you review a selection of Flashcards due for this review. The review will not be finished until all cards are out of the queue (e.g. you answered « Correct » to all flashcards; otherwise the card stays in the queue), even if you take multiple days to go through. This being said, you also can have multiple reviews in a single day. Actually, this plugin does not look at dates and time, but only on review indexes. That is why when you answer « Correct » you will not see the card again in x days, but rather in x reviews.
 
 ### Deck
 
