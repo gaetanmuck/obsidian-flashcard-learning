@@ -1,96 +1,71 @@
-# Obsidian Sample Plugin
+# Flashcard learning
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+Flashcard-Learning is an Obsidian plugin made to learn things and remember them. 
+Put your flashcards where you notes lie thanks to Obsidian, and create card out of your note to remember their substance, key concepts, or just knowledge like countries main cities.
 
-This project uses Typescript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.
+## Main concepts
 
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
+### Flashcard
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Changes the default font color to red using `styles.css`.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+A Flashcard is made of: 
+- A Deck, 
+- A first side with its description
+- A second side with its description
+- A level
 
-## First time developing plugins?
+### Review
 
-Quick starting guide for new plugin devs:
+We call a review, a learning session in which you review a selection of flashcards due for this review. The review will not be finished until all cards are out of the queue (e.g. you answered « Correct » to all flashcards; otherwise the card stays in the queue), even if you take multiple days to go through. This being said, you also can have multiple reviews in a single days. Actually, this plugin does not look at dates and time, but only on review indexes. That is why when you answer « Correct » you will not see the card again in x days, but rather in x reviews.
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+### Deck
 
-## Releasing new releases
+Deck is parent of Flashcard. Each Flashcard should belong to one Deck. 
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+This is why, by default, all Flashcards belonging to the Deck « No Deck » will not be treated. If you have such cards in your vault, you should search with Obsidian the string « No deck » and replace them with the Deck you want to attribute them.
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+How are those « No deck » card existing? If you delete a Deck via the plugin settings, and you still have card in that deck, rather to also delete the card with it, they will be changed to « No deck ». That is so to avoid to delete information to fast. Another possibility of having no deck is if you create card manually: it is possible to directly in your Obsidian notes to create Flashcard with the right syntax. Then, when the home modal will load (by pressing the book icon on the ribbon) it will parse all Flashcards and attribute « No deck » to all Flashcard with an non existing deck. 
 
-## Adding your plugin to the community plugin list
+Each Deck has a review index that will be incremented each time you review it.
 
-- Check https://github.com/obsidianmd/obsidian-releases/blob/master/plugin-review.md
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+In this plugin, you also have the possibility to review all deck at once. It has then the consequence to increment indexes of all decks at once.
 
-## How to use
+### Description
 
-- Clone this repo.
-- `npm i` or `yarn` to install dependencies
-- `npm run dev` to start compilation in watch mode.
+Each side of each Flashcard has a description field. This field helps the learner to know what he is asked for. For instance, if you would only have a Flashcard content with a « 1 » in it, what is expected to guess? But the description tells you « Atom: » so that you understand what you need to find, and can easily answer « Hydrogen ».
 
-## Manually installing the plugin
+#### Level
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+All Flashcard has a level attributed. By default, on creation it has level 0. This tells how well you know a Flashcard. The more correct answer you give in a row, the higher the level will be. The level number also corresponds to the time you will have to wait before seeing this card again (if you answer correctly), or will drop to 0 (if you are wrong), and you will see this card again on next review.
 
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
 
-## Funding URL
+## Get started
 
-You can include funding URLs where people who use your plugin can financially support it.
+If you want to use this plugin, simply install and enable it through the community plugin store inside Obsidian. 
+Once you have installed it, your Obsidian vault has two new features: the first one is accessible via a command « Create Flashcard », and the other is the book icon in the main ribbon.
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+### « Create Flashcard » command
 
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
-```
+This command is available when you are editing a note in your Obsidian vault. It allows you to create a Flashcard without mistake. 
 
-If you have multiple URLs, you can also do:
+On activation this command will open a modal containing a form with all the information needed to create a Flashcard. Once you have filled everything and validate the form, the plugin will add two new lines where your cursor was to create two Flashcards out of the information you provided. One good solution could be to have a Flashcard section in your notes to put all Flashcards there, but that is just an idea, you manage your notes as you wish.
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
+If you understand what this commands produce, you could also create Flashcards manually with your keyboard, or other techniques you know about (copy/paste, code, ...). Maybe it is more suitable for you when you would create a bunch of Flashcards in one time. You could also put all Flashcards of a Deck in a dedicated file, that is up to you.
 
-## API Documentation
+One counter part of creating a lot Flashcard in one time could be to have a lot of new information in the next review, and that is maybe not optimal to learn correclty. 
+To take this problem away you could create only a certain number of new Flashcard a day, or « deactivate » some of them by changing the string (like writing `-FLASHCARD...` instead of `FLASHCARD...`), but again, this is up to you.
 
-See https://github.com/obsidianmd/obsidian-api
+### Book button in the ribbon
+
+This button is the place to start reviews. When clicking on it, you will be informed of general statistics about all your Flashcards, and have the possibility to start a review, either on a particular Deck, or on all of them. No rocket science there, just the GUI of the plugin.
+
+
+## Other existing solutions
+
+There is other existing solutions across the web to handle Flashcard learning with the more popular of them [Anki](https://apps.ankiweb.net/). This plugin does not have the pretention of being better than these other solutions. I (the developer of this plugin) was just not 100% satisfied with what he used and tried accross the years. And it came a time where I discovered that developping an Obsidian plugin is not so hard, so I decided to invest the time to make a Flashcard app that answers my need and that would be in the same application my Second Brain is! I also decided to share it with everyone, in case it also correspond to the need of others, so if you read until here, I consider it already worth the investment.
+
+In case you would give my investment event more worth, here is a link to do it:
+
+<a href="https://www.buymeacoffee.com/gaetanmuck" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
+
+Cheers!
