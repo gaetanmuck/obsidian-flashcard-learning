@@ -15,7 +15,7 @@ A Flashcard is made of:
 
 ### Review
 
-We call a review, a learning session in which you review a selection of flashcards due for this review. The review will not be finished until all cards are out of the queue (e.g. you answered « Correct » to all flashcards; otherwise the card stays in the queue), even if you take multiple days to go through. This being said, you also can have multiple reviews in a single days. Actually, this plugin does not look at dates and time, but only on review indexes. That is why when you answer « Correct » you will not see the card again in x days, but rather in x reviews.
+A review, is a learning session in which you review a selection of Flashcards due for this review. The review will not be finished until all cards are out of the queue (e.g. you answered « Correct » to all flashcards; otherwise the card stays in the queue), even if you take multiple days to go through. This being said, you also can have multiple reviews in a single day. Actually, this plugin does not look at dates and time, but only on review indexes. That is why when you answer « Correct » you will not see the card again in x days, but rather in x reviews.
 
 ### Deck
 
@@ -23,7 +23,7 @@ Deck is parent of Flashcard. Each Flashcard should belong to one Deck.
 
 This is why, by default, all Flashcards belonging to the Deck « No Deck » will not be treated. If you have such cards in your vault, you should search with Obsidian the string « No deck » and replace them with the Deck you want to attribute them.
 
-How are those « No deck » card existing? If you delete a Deck via the plugin settings, and you still have card in that deck, rather to also delete the card with it, they will be changed to « No deck ». That is so to avoid to delete information to fast. Another possibility of having no deck is if you create card manually: it is possible to directly in your Obsidian notes to create Flashcard with the right syntax. Then, when the home modal will load (by pressing the book icon on the ribbon) it will parse all Flashcards and attribute « No deck » to all Flashcard with an non existing deck. 
+How are those « No deck » card existing? If you delete a Deck via the plugin settings, and you still have card in that deck, rather to also delete the card with it, they will be changed to « No deck ». That is so to avoid to delete information to fast. Another possibility of having « No deck » is if you create card manually: it is possible to directly, in your Obsidian notes, create Flashcard with the right syntax. Then, when the home modal will load (by pressing the book icon on the ribbon) it will parse all Flashcards and attribute « No deck » to all Flashcard with an non existing deck. 
 
 Each Deck has a review index that will be incremented each time you review it.
 
