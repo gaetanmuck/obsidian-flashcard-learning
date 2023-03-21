@@ -44,22 +44,22 @@ export class CreateFlashcardModal extends Modal {
 		// Side 1 Description Text field
 		new Setting(contentEl)
 			.setName("Side 1 description")
-			.addText(text => text.onChange(value => this.side1Desc = value))
+			.addText(text => text.onChange(value => this.side1Desc = value.trim()))
 
 		// Side 1 Text field
 		new Setting(contentEl)
 			.setName("Side 1")
-			.addText(text => text.onChange(value => this.side1 = value))
+			.addText(text => text.onChange(value => this.side1 = value.trim()))
 
 		// Side 2 Description Text field
 		new Setting(contentEl)
 			.setName("Side 2 description")
-			.addText(text => text.onChange(value => this.side2Desc = value))
+			.addText(text => text.onChange(value => this.side2Desc = value.trim()))
 
 		// Side 2 Text field
 		new Setting(contentEl)
 			.setName("Side 2")
-			.addText(text => text.onChange(value => this.side2 = value))
+			.addText(text => text.onChange(value => this.side2 = value.trim()))
 
 		// Level, only update when it is a number
 		new Setting(contentEl)

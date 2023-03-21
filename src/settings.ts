@@ -137,7 +137,7 @@ export class FlashcardSettingTab extends PluginSettingTab {
 
                 // Delete button
                 .addButton(button => button
-                    .setButtonText('Delete deck')
+                    .setButtonText('🗑️')
                     .setTooltip('Delete only the deck, not the flashcards (they will be set to \'No deck\')')
                     .onClick(() => {
                         // On change, we allow user to save action
@@ -148,7 +148,7 @@ export class FlashcardSettingTab extends PluginSettingTab {
 
                 // Reset progress button
                 .addButton(button => button
-                    .setButtonText('Reset progress')
+                    .setButtonText('Reset')
                     .setTooltip('Reset all progress')
                     .onClick(() => {
                         // On change, we allow user to save action
@@ -161,7 +161,9 @@ export class FlashcardSettingTab extends PluginSettingTab {
             // When an action has been made on a deck, 
             // First allow user to save his change,
             // Then call the write function
-            const saveButton = deckRow.createEl('button');
+            const save_container = deckRow.createDiv();
+            save_container.addClasses(['p-top-5px'])
+            const saveButton = save_container.createEl('button');
             saveButton.addClasses(['bg-red'])
             saveButton.setText('Save')
             saveButton.toggleVisibility(false); // By default, nothing has changed, so we keep button hidden

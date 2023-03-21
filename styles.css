@@ -44,8 +44,18 @@
     justify-content: space-around;
 }
 
+.col-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .flex-grow {
     flex-grow: 1;
+}
+
+.p-5px {
+    padding: 5px;
 }
 
 .p-10px {
@@ -73,6 +83,10 @@
 .p-y-30px {
     padding-top: 30px;
     padding-bottom: 30px;
+}
+
+.p-top-5px {
+    padding-top: 5px;
 }
 
 .m-y-10px {
@@ -110,6 +124,14 @@
 
 .max-w-33pct {
     max-width: 33%;
+}
+
+.max-w-60pct {
+    max-width: 60%;
+}
+
+.max-w-100pct {
+    max-width: 100%;
 }
 
 .max-w-500px {

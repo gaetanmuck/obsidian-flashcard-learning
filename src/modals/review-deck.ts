@@ -33,7 +33,6 @@ export class ReviewDeckModal extends Modal {
 
 
     onOpen() {
-
         // Find the deck's Flashcards
         for (const deck of this.decks) {
             const selection = this.flashcards.filter(fc => fc.deck == deck);
@@ -110,16 +109,25 @@ export class ReviewDeckModal extends Modal {
         // Flashcard information
 
         const infos = this.container.createDiv();
-        infos.addClasses(['row-space-around', 'p-y-30px', 'm-y-10px']);
+        infos.addClasses(['col-space-around', 'p-y-10px']);
+        // Line Deck and Left number
+        const line1 = infos.createDiv();
+        line1.addClasses(['row-space-between'])
         // Deck
-        const deck_html = infos.createSpan({ text: `📦 ${flashcard.deck.name}` })
-        deck_html.addClasses(['nowrap', 'max-w-33pct', 'overflow-hidden']);
-        // Level
-        const level_html = infos.createSpan({ text: `🆙 Level ${flashcard.level}` })
-        level_html.addClasses(['nowrap', 'max-w-33pct', 'overflow-hidden']);
+        const deck_html = line1.createDiv({ text: `📦 ${flashcard.deck.name}` })
+        deck_html.addClasses(['nowrap', 'max-w-60pct', 'overflow-hidden', 'p-5px']);
+        // Number left
+        const number_html = line1.createDiv({ text: `⏲️ ${this.queue.length} left`, cls: 'nowrap'})
+        number_html.addClasses(['nowrap', 'max-w-100pct', 'overflow-hidden', 'p-5px']);
+        // Line File and Level
+        const line2 = infos.createDiv();
+        line2.addClasses(['row-space-between'])
         // File
-        const file_html = infos.createSpan({ text: `📁 ${flashcard.file?.basename}`, cls: 'nowrap'})
-        file_html.addClasses(['nowrap', 'max-w-33pct', 'overflow-hidden']);
+        const file_html = line2.createSpan({ text: `📁 ${flashcard.file?.basename}`, cls: 'nowrap'})
+        file_html.addClasses(['nowrap', 'max-w-60pct', 'overflow-hidden', 'p-5px']);
+        // Level
+        const level_html = line2.createDiv({ text: `🆙 Level ${flashcard.level}` })
+        level_html.addClasses(['nowrap', 'p-5px']);
 
 
         // Front side
@@ -161,6 +169,7 @@ export class ReviewDeckModal extends Modal {
         // Commands
 
         const commands_container = this.container.createDiv();
+        commands_container.addClasses(['w-100pct', 'row-center'])
 
         const showAnswer = commands_container.createEl('button', { text: '👀 Show answer' });
         showAnswer.addClasses(['w-33pct', 'txt-bold', 'visible'])
@@ -183,7 +192,7 @@ export class ReviewDeckModal extends Modal {
         })
 
         const wrongBtn = commands_container.createEl('button', { text: '✖️ Wrong' });
-        wrongBtn.addClasses(['w-33pct', 'bg-red', 'txt-bold', 'hidden'])
+        wrongBtn.addClasses(['w-33pct', 'bg-red', 'txt-bold', 'hidden', 'max-w-33pct'])
         wrongBtn.onClickEvent(() => {
             flashcard.wasWrong(this.app.vault);
 
@@ -194,7 +203,7 @@ export class ReviewDeckModal extends Modal {
         })
 
         const correcBtn = commands_container.createEl('button', { text: '✔️ Correct' });
-        correcBtn.addClasses(['w-33pct', 'bg-green', 'txt-dark', 'txt-bold', 'hidden']);
+        correcBtn.addClasses(['w-33pct', 'bg-green', 'txt-dark', 'txt-bold', 'hidden', 'max-w-33pct']);
         correcBtn.onClickEvent(() => {
             flashcard.wasCorrect(this.app.vault);
 
