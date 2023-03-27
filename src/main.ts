@@ -25,7 +25,7 @@ export default class FlashcardLearningPlugin extends Plugin {
 		// Editor commands to create flashcard
 		this.addCommand({
 			id: 'create-flashcard',
-			name: 'Create new Flascard',
+			name: 'Create new flashcard',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
                 new CreateFlashcardModal(this.app, this.settings, editor.getCursor().line, (fc1: Flashcard, fc2: Flashcard) => {
                     editor.replaceSelection('\n')
