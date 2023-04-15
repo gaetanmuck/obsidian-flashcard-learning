@@ -172,7 +172,7 @@ export class ReviewDeckModal extends Modal {
         commands_container.addClasses(['w-100pct', 'row-center'])
 
         const showAnswer = commands_container.createEl('button', { text: '👀 Show answer' });
-        showAnswer.addClasses(['w-33pct', 'txt-bold', 'visible'])
+        showAnswer.addClasses(['w-33pct', 'txt-bold', 'visible', 'btn-height'])
         showAnswer.onClickEvent(() => {
             // Show answer
             answer.remove();
@@ -192,7 +192,7 @@ export class ReviewDeckModal extends Modal {
         })
 
         const wrongBtn = commands_container.createEl('button', { text: '✖️ Wrong' });
-        wrongBtn.addClasses(['w-33pct', 'bg-red', 'txt-bold', 'hidden', 'max-w-33pct'])
+        wrongBtn.addClasses(['w-33pct', 'bg-red', 'txt-bold', 'hidden', 'max-w-33pct', 'btn-height'])
         wrongBtn.onClickEvent(() => {
             flashcard.wasWrong(this.app.vault);
 
@@ -203,7 +203,7 @@ export class ReviewDeckModal extends Modal {
         })
 
         const correcBtn = commands_container.createEl('button', { text: '✔️ Correct' });
-        correcBtn.addClasses(['w-33pct', 'bg-green', 'txt-dark', 'txt-bold', 'hidden', 'max-w-33pct']);
+        correcBtn.addClasses(['w-33pct', 'bg-green', 'txt-dark', 'txt-bold', 'hidden', 'max-w-33pct', 'btn-height']);
         correcBtn.onClickEvent(() => {
             flashcard.wasCorrect(this.app.vault);
 

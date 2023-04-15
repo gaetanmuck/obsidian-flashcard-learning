@@ -28,37 +28,6 @@ export class HomeModal extends Modal {
 		// Fetch all available flashcards on each 'load'
 		await this.fetchFlashcards()
 
-
-		// STATISTICS
-
-		// Values
-		const avgLevel = this.flashcards.reduce((acc, cur) => acc + cur.level, 0) / this.flashcards.length;
-		const higherLevel = Math.max(...this.flashcards.map(fc => fc.level));
-
-		// Container
-		const stats_container = container.createDiv()
-		stats_container.addClasses(['col-start', 'p-y-10px', 'p-x-30px'])
-		stats_container.createEl('h5', { text: '📊 Statistics' });
-
-		// Flashcard number
-		const stats_flashcardNumber = stats_container.createDiv();
-		stats_flashcardNumber.addClasses(['row-space-between', 'p-y-10px', 'p-x-30px']);
-		stats_flashcardNumber.createDiv({ text: 'Flashcard number:' })
-		stats_flashcardNumber.createDiv({ text: this.flashcards.length + '' })
-
-		// Average level
-		const stats_avgLevel = stats_container.createDiv();
-		stats_avgLevel.addClasses(['row-space-between', 'p-y-10px', 'p-x-30px']);
-		stats_avgLevel.createDiv({ text: 'Average level:' })
-		stats_avgLevel.createDiv({ text: (Math.round(avgLevel * 10) / 10) + '' })
-
-		// Higher level
-		const stats_higherLevel = stats_container.createDiv();
-		stats_higherLevel.addClasses(['row-space-between', 'p-y-10px', 'p-x-30px']);
-		stats_higherLevel.createDiv({ text: 'Higher level:' })
-		stats_higherLevel.createDiv({ text: higherLevel + '' })
-
-
 		// REVIEW
 
 		// Container
@@ -95,6 +64,55 @@ export class HomeModal extends Modal {
 				)
 
 		})
+
+
+		// STATISTICS
+
+		// Values
+		const avgLevel = this.flashcards.reduce((acc, cur) => acc + cur.level, 0) / this.flashcards.length;
+		const higherLevel = Math.max(...this.flashcards.map(fc => fc.level));
+		const histogram = [];
+		for(let i = 0; i <= higherLevel; i++) {
+			const nb = this.flashcards.filter(fc => fc.level == i).length
+			histogram.push({
+				count: nb,
+				rate: Math.round((nb / this.flashcards.length) * 100)
+			})
+		}
+
+		// Container
+		const stats_container = container.createDiv()
+		stats_container.addClasses(['col-start', 'p-y-10px', 'p-x-30px'])
+		stats_container.createEl('h5', { text: '📊 Statistics' });
+
+		// Flashcard number
+		const stats_flashcardNumber = stats_container.createDiv();
+		stats_flashcardNumber.addClasses(['row-space-between', 'p-y-10px', 'p-x-30px']);
+		stats_flashcardNumber.createDiv({ text: 'Flashcard number:' })
+		stats_flashcardNumber.createDiv({ text: this.flashcards.length + '' })
+
+		// Average level
+		const stats_avgLevel = stats_container.createDiv();
+		stats_avgLevel.addClasses(['row-space-between', 'p-y-10px', 'p-x-30px']);
+		stats_avgLevel.createDiv({ text: 'Average level:' })
+		stats_avgLevel.createDiv({ text: (Math.round(avgLevel * 10) / 10) + '' })
+
+		// Higher level
+		const stats_higherLevel = stats_container.createDiv();
+		stats_higherLevel.addClasses(['row-space-between', 'p-y-10px', 'p-x-30px']);
+		stats_higherLevel.createDiv({ text: 'Higher level:' })
+		stats_higherLevel.createDiv({ text: higherLevel + '' })
+
+		// Histogram
+		const stats_histogram = stats_container.createDiv();
+		stats_histogram.addClasses(['col-start', 'p-x-30px'])
+		for(let i = 0; i < histogram.length; i++) {
+			const row = stats_histogram.createDiv();
+			row.addClasses(['row-space-between', 'p-y-10px']);
+			row.createDiv({ text: 'Cards at level ' + i })
+			row.createDiv({ text: histogram[i].count + ' (' + histogram[i].rate + '%)' })
+		}
+
 	}
 
 	onClose() {
