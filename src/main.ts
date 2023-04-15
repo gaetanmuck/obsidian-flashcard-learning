@@ -28,10 +28,7 @@ export default class FlashcardLearningPlugin extends Plugin {
 			name: 'Create new Flascard',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
                 new CreateFlashcardModal(this.app, this.settings, editor.getCursor().line, (fc1: Flashcard, fc2: Flashcard) => {
-                    editor.replaceSelection('\n')
-                    editor.replaceSelection(fc1.toString())
-                    editor.replaceSelection('\n')
-                    editor.replaceSelection(fc2.toString())
+                    editor.replaceSelection('\n' + fc1.toString() + '\n' + fc2.toString())
                 }).open()
 			}
 		});
