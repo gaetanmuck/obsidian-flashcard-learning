@@ -1,4 +1,4 @@
-import { Modal, App, Setting } from 'obsidian'
+import { Modal, App, Setting, DropdownComponent } from 'obsidian'
 import { Flashcard } from 'src/model/flashcard';
 import { FlashcardLearningSettings } from 'src/model/settings';
 import { Deck } from '../model/deck';
@@ -19,12 +19,22 @@ export class CreateFlashcardModal extends Modal {
 	level: number;
 
 
-	constructor(app: App, settings: FlashcardLearningSettings, lineNb: number, onSubmit: (fc1: Flashcard, fc2: Flashcard) => void) {
+	constructor(app: App, settings: FlashcardLearningSettings, lineNb: number, defaults: {deck:string, side1_desc:string, side2_desc:string}, onSubmit: (fc1: Flashcard, fc2: Flashcard) => void) {
 		super(app);
 		this.settings = settings;
 		this.onSubmit = onSubmit;
+		
+		// Handling defaults from md file
+		if(defaults.deck != '' && settings.decks.find(d => d.name == defaults.deck)) this.deck = settings.decks.find(d => d.name == defaults.deck) ?? settings.decks[0] ?? 'No deck'
+		if(defaults.side1_desc != '') this.side1Desc = defaults.side1_desc
+		if(defaults.side2_desc != '') this.side2Desc = defaults.side2_desc
 
-		this.deck = settings.decks[0] ?? 'No deck';
+
+		console.log('decks', settings.decks.map(d => d.name))
+		console.log('default', defaults.deck)
+		console.log('found', settings.decks.find(d => d.name == defaults.deck))
+
+		// this.deck = this.deck ?? settings.decks[0] ?? 'No deck'; // Already handled
 		this.level = settings.defaultLevel;
 		this.lineNb = lineNb;
 	}
@@ -37,14 +47,15 @@ export class CreateFlashcardModal extends Modal {
 		new Setting(contentEl)
 			.setName("Deck")
 			.addDropdown(dropdown => {
-				this.settings.decks.forEach((deck, i) => dropdown.addOption(i + '', deck.name))
+				this.settings.decks.forEach((deck, i) => dropdown.addOption(deck.name, deck.name))
 				dropdown.onChange(value => this.deck = this.settings.decks[parseInt(value)])
-			})
+				dropdown.setValue(this.deck.name)
+		})
 
 		// Side 1 Description Text field
 		new Setting(contentEl)
 			.setName("Side 1 description")
-			.addText(text => text.onChange(value => this.side1Desc = value.trim()))
+			.addText(text => text.onChange(value => this.side1Desc = value.trim()).setValue(this.side1Desc))
 
 		// Side 1 Text field
 		new Setting(contentEl)
@@ -54,7 +65,7 @@ export class CreateFlashcardModal extends Modal {
 		// Side 2 Description Text field
 		new Setting(contentEl)
 			.setName("Side 2 description")
-			.addText(text => text.onChange(value => this.side2Desc = value.trim()))
+			.addText(text => text.onChange(value => this.side2Desc = value.trim()).setValue(this.side2Desc))
 
 		// Side 2 Text field
 		new Setting(contentEl)
