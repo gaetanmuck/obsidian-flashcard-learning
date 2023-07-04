@@ -35,11 +35,12 @@ export default class FlashcardLearningPlugin extends Plugin {
                 const paramsStr = value.substring(beginParamIdx, endParamIdx)
                 const paramsArr = paramsStr.split('\n')
 
-                const defaults = { deck:'', side1_desc: '', side2_desc: ''}
+                const defaults = { deck:'', side1_desc: '', side1: '', side2_desc: '', side2: '', level: this.settings.defaultLevel + ''}
                 for (let i = 0; i < paramsArr.length; i++) {
                     const varName = paramsArr[i].substring(0, paramsArr[i].indexOf(':'))
                     const varValue = paramsArr[i].substring(paramsArr[i].indexOf(':') + 1).trim()
-                    if (Object.keys(defaults).includes(varName)) defaults[varName as 'deck' | 'side1_desc' | 'side2_desc'] = varValue
+                    if (Object.keys(defaults).includes(varName)) 
+                        defaults[varName as 'deck' | 'side1_desc' | 'side1' | 'side2_desc' | 'side2' | 'level'] = varValue
                 }
 
 

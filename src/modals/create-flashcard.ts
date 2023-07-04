@@ -19,23 +19,18 @@ export class CreateFlashcardModal extends Modal {
 	level: number;
 
 
-	constructor(app: App, settings: FlashcardLearningSettings, lineNb: number, defaults: {deck:string, side1_desc:string, side2_desc:string}, onSubmit: (fc1: Flashcard, fc2: Flashcard) => void) {
+	constructor(app: App, settings: FlashcardLearningSettings, lineNb: number, defaults: {deck:string, side1_desc:string, side1:string, side2_desc:string, side2:string, level:string}, onSubmit: (fc1: Flashcard, fc2: Flashcard) => void) {
 		super(app);
 		this.settings = settings;
 		this.onSubmit = onSubmit;
 		
 		// Handling defaults from md file
-		if(defaults.deck != '' && settings.decks.find(d => d.name == defaults.deck)) this.deck = settings.decks.find(d => d.name == defaults.deck) ?? settings.decks[0] ?? 'No deck'
-		if(defaults.side1_desc != '') this.side1Desc = defaults.side1_desc
-		if(defaults.side2_desc != '') this.side2Desc = defaults.side2_desc
-
-
-		console.log('decks', settings.decks.map(d => d.name))
-		console.log('default', defaults.deck)
-		console.log('found', settings.decks.find(d => d.name == defaults.deck))
-
-		// this.deck = this.deck ?? settings.decks[0] ?? 'No deck'; // Already handled
-		this.level = settings.defaultLevel;
+		this.deck = settings.decks.find(d => d.name == defaults.deck) ?? settings.decks[0] ?? 'No deck'
+		this.side1Desc = defaults.side1_desc
+		this.side1 = defaults.side1
+		this.side2Desc = defaults.side2_desc
+		this.side2 = defaults.side2
+		this.level = parseInt(defaults.level) ?? settings.defaultLevel;
 		this.lineNb = lineNb;
 	}
 
@@ -60,23 +55,26 @@ export class CreateFlashcardModal extends Modal {
 		// Side 1 Text field
 		new Setting(contentEl)
 			.setName("Side 1")
-			.addText(text => text.onChange(value => this.side1 = value.trim()))
+			.addText(text => text.onChange(value => this.side1 = value.trim())
+			.setValue(this.side1))
 
 		// Side 2 Description Text field
 		new Setting(contentEl)
 			.setName("Side 2 description")
-			.addText(text => text.onChange(value => this.side2Desc = value.trim()).setValue(this.side2Desc))
+			.addText(text => text.onChange(value => this.side2Desc = value.trim())
+			.setValue(this.side2Desc))
 
 		// Side 2 Text field
 		new Setting(contentEl)
 			.setName("Side 2")
-			.addText(text => text.onChange(value => this.side2 = value.trim()))
+			.addText(text => text.onChange(value => this.side2 = value.trim())
+			.setValue(this.side2))
 
 		// Level, only update when it is a number
 		new Setting(contentEl)
 			.setName("Level")
 			.addText(text => text
-				.setValue(this.settings.defaultLevel + '')
+				.setValue(this.level + '')
 				.onChange(value => this.level = Number(value) ?? this.settings.defaultLevel))
 
 		// Submit button: send back 2 news Flashcard (side1/side2 AND side2/side1)
