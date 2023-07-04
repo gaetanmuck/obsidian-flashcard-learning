@@ -1,6 +1,8 @@
 # Flashcard Learning
 
-TL;DR: Flashcard Learning is an Obsidian plugin that helps you learn and remember information effectively. Create flashcards within your notes, review them, and reinforce your knowledge.
+**TL;DR:** 
+
+Flashcard Learning is an Obsidian plugin that helps you learn and remember information effectively. Create flashcards within your notes, review them, and reinforce your knowledge.
 
 ## Key Concepts
 
