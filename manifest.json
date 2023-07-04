@@ -1,7 +1,7 @@
 {
 	"id": "flashcard-learning",
 	"name": "Flashcard Learning",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"minAppVersion": "0.15.0",
 	"description": "This is a pluggin that implements how flashcards can be used inside Obsidian in order to learn and remember things.",
 	"author": "Gaétan Muck",
