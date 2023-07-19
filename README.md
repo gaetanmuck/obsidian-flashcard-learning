@@ -20,6 +20,7 @@ Each side of a Flashcard has a description to guide your understanding, helps yo
 
 ### Level
 Flashcards have levels indicating your familiarity. Correct answers increase the level, while incorrect answers reset it to 0.
+If a card has the level 5, it means that this card will be seen again in 5 reviews.
 
 ## Getting Started
 
