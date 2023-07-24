@@ -1,6 +1,4 @@
-import { App, Modal, Setting } from 'obsidian';
-
-
+import { App, Modal } from 'obsidian';
 
 
 export class ConfirmModal extends Modal {
@@ -21,14 +19,14 @@ export class ConfirmModal extends Modal {
         row.addClasses(['row-space-between', 'p-30px']);
 
         // Cancel Button
-        const cancelButton = row.createEl('button', {text: 'Cancel'});
+        const cancelButton = row.createEl('button', { text: 'Cancel' });
         cancelButton.onClickEvent(() => {
             this.close();
             this.onSubmit(false);
         })
 
         // Confirm Button
-        const confirmButton = row.createEl('button', {text: 'Confirm'});
+        const confirmButton = row.createEl('button', { text: 'Confirm' });
         confirmButton.addClasses(['bg-red']);
         confirmButton.onClickEvent(() => {
             this.close();
@@ -36,8 +34,8 @@ export class ConfirmModal extends Modal {
         })
     }
 
-	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
-	}
+    onClose() {
+        const { contentEl } = this;
+        contentEl.empty();
+    }
 }

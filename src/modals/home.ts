@@ -1,7 +1,7 @@
-import { Modal, App, Setting } from 'obsidian'
+import { Modal, App, Setting, Notice } from 'obsidian'
 import FlashcardLearningPlugin from 'src/main';
 import { Flashcard } from 'src/model/flashcard';
-import { ReviewDeckModal } from './review-deck';
+import { ReviewModal } from './review';
 
 
 export class HomeModal extends Modal {
@@ -18,22 +18,24 @@ export class HomeModal extends Modal {
 		this.modalEl.addClasses(['w-80pct', 'max-w-500px'])
 	}
 
+
 	async onOpen() {
 
 		// Title and container
-		this.contentEl.createEl('h1', { text: "📚 Flashcard Learning" });
+		this.contentEl.createEl('h1', { text: "🃟 Flashcard Learning" });
 		const container = this.contentEl.createDiv();
 		container.addClasses(['col-start'])
 
 		// Fetch all available flashcards on each 'load'
 		await this.fetchFlashcards()
 
+
 		// REVIEW
 
 		// Container
 		const review_container = container.createDiv()
 		review_container.addClasses(['col-start', 'p-y-10px', 'p-x-30px'])
-		review_container.createEl('h5', { text: '📦 Review decks' });
+		review_container.createEl('h5', { text: '🔀 Review' });
 
 		// Settings container
 		const settings_container = review_container.createDiv()
@@ -41,29 +43,14 @@ export class HomeModal extends Modal {
 
 		// All decks
 		new Setting(settings_container)
-			.setName('Review all')
+			.setName(`Review (index: ${this.plugin.settings.reviewIndex})`)
 			.addButton(button => button
 				.setButtonText('Start')
 				.onClick(() => {
+					new ReviewModal(this.app, this.plugin, this.flashcards).open();
 					this.close();
-					new ReviewDeckModal(this.app, this.plugin, this.flashcards, 'all').open();
 				})
 			)
-
-		// Each deck
-		this.plugin.settings.decks.forEach(deck => {
-			new Setting(settings_container)
-				.setName(`Review ${deck.name}`)
-				.setDesc(`Reviews done: ${deck.reviewIndex}`)
-				.addButton(button => button
-					.setButtonText('Start')
-					.onClick(() => {
-						this.close();
-						new ReviewDeckModal(this.app, this.plugin, this.flashcards, deck.name).open();
-					})
-				)
-
-		})
 
 
 		// STATISTICS
@@ -72,18 +59,22 @@ export class HomeModal extends Modal {
 		const avgLevel = this.flashcards.reduce((acc, cur) => acc + cur.level, 0) / this.flashcards.length;
 		const higherLevel = Math.max(...this.flashcards.map(fc => fc.level));
 		const histogram = [];
-		for(let i = 0; i <= higherLevel; i++) {
+		for (let i = 0; i <= higherLevel; i++) {
 			const nb = this.flashcards.filter(fc => fc.level == i).length
-			histogram.push({
-				count: nb,
-				rate: Math.round((nb / this.flashcards.length) * 100)
-			})
+			histogram.push({ count: nb, rate: Math.round((nb / this.flashcards.length) * 100) })
 		}
+		const newFlashcardsNb = this.flashcards.reduce((acc, cur) => cur.level == -1 ? acc + 1 : acc, 0)
 
 		// Container
 		const stats_container = container.createDiv()
 		stats_container.addClasses(['col-start', 'p-y-10px', 'p-x-30px'])
 		stats_container.createEl('h5', { text: '📊 Statistics' });
+
+		// Flashcard number
+		const stats_newflashcardNumber = stats_container.createDiv();
+		stats_newflashcardNumber.addClasses(['row-space-between', 'p-y-10px', 'p-x-30px']);
+		stats_newflashcardNumber.createDiv({ text: 'New flashcard number:' })
+		stats_newflashcardNumber.createDiv({ text: newFlashcardsNb + '' })
 
 		// Flashcard number
 		const stats_flashcardNumber = stats_container.createDiv();
@@ -106,7 +97,7 @@ export class HomeModal extends Modal {
 		// Histogram
 		const stats_histogram = stats_container.createDiv();
 		stats_histogram.addClasses(['col-start', 'p-x-30px'])
-		for(let i = 0; i < histogram.length; i++) {
+		for (let i = 0; i < histogram.length; i++) {
 			const row = stats_histogram.createDiv();
 			row.addClasses(['row-space-between', 'p-y-10px']);
 			row.createDiv({ text: 'Cards at level ' + i })
@@ -123,33 +114,39 @@ export class HomeModal extends Modal {
 
 	private async fetchFlashcards() {
 		// Look for flashcards across the vault
+		let malformedFound = false
 		this.flashcards = [];
 		await Promise.all(
 			// Go through all the files
-			this.app.vault.getMarkdownFiles().map(async file => {
-				// And each lines
-				const lines = (await this.app.vault.read(file)).split('\n');
-				let change = false;
-				lines.forEach(async (line, i) => {
+			this.app.vault.getMarkdownFiles()
+				.filter(file => this.app.metadataCache.getFileCache(file)?.frontmatter?.flashcard)
+				.map(async file => {
+					let needToSave = false;
 
-					// If the line has the correct begining, it is flashcard
-					if (line.startsWith('FLASHCARD')) {
-						const result = Flashcard.fromString(file, i, this.plugin.settings.decks, line);
+					// Get the lines (needed to remember which line a str is for replacement (malformed))
+					const lines = (await this.app.vault.read(file)).split('\n')
+					lines.forEach(async (line, i) => {
 
-						// We only want the ones that are correct, and that have a deck
-						if (!result.malformed && result.deck.name != 'No deck') this.flashcards.push(result);
+						// Is it a flashcard?
+						if (Flashcard.isStrAFlashcard(line)) {
 
-						// If we find a malformed, the file is updated to let user know
-						if(result.malformed) {
-							lines[i] = result.toString();
-							change = true;
+							// Parse flashcard
+							const flashcard = Flashcard.fromString(file, i, line)
+
+							// If parsing went well, adds it, otherwise, replace the string
+							if (!flashcard.malformed) this.flashcards.push(flashcard)
+							else {
+								needToSave = true
+								malformedFound = true
+								lines[i] = flashcard.malformed
+							}
 						}
-					}
+					})
+
+					// Only write changed files (because a malformed flashcard was found)
+					if (needToSave) this.plugin.app.vault.modify(file, lines.join('\n'))
 				})
-				
-				// Only write changed files (because a malformed flashcard was found)
-				if (change) this.plugin.app.vault.modify(file, lines.join('\n'))
-			})
 		)
+		if (malformedFound) new Notice('Malformed Flashcard has been found, look for string "❌️" to find them.')
 	}
 }

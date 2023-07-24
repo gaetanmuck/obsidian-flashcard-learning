@@ -1,5 +1,4 @@
 import { TFile, Vault } from 'obsidian';
-import { Deck } from './deck';
 
 export class Flashcard {
 
@@ -8,23 +7,23 @@ export class Flashcard {
     lineNb: number | undefined;
 
     // Card info
-    deck: Deck;
-    recto: string;
-    rectoDesc: string;
-    verso: string;
-    versoDesc: string;
     level: number;
-    reviewIndex: number;
+    nextReview: number;
+    deck: string;
+    side1: string;
+    side1Desc: string;
+    side2: string;
+    side2Desc: string;
 
     // Problem flag;
     malformed: false | string;
 
 
-    constructor(deck: Deck | undefined, recto: string, rectoDesc: string, verso: string, versoDesc: string, level: number, reviewIndex = 0, file?: TFile, lineNb?: number) {
+    constructor(level: number, reviewIndex: number, deck: string | undefined,  side1Desc: string, side1: string, side2Desc: string, side2: string, file?: TFile, lineNb?: number) {
 
         // Check mandatories information
-        if (recto === undefined) throw new Error('Recto is not defined')
-        if (verso === undefined) throw new Error('Verso is not defined')
+        if (side1 === undefined) throw new Error('side1 is not defined')
+        if (side2 === undefined) throw new Error('side2 is not defined')
         if (level === undefined) throw new Error('Level is not defined')
 
         // About localization
@@ -32,75 +31,122 @@ export class Flashcard {
         this.lineNb = lineNb;
 
         // Card infos
-        this.deck = deck ?? new Deck('No deck');
-        this.recto = recto;
-        this.rectoDesc = rectoDesc;
-        this.verso = verso;
-        this.versoDesc = versoDesc;
+        this.deck = deck ?? 'No deck';
+        this.side1 = side1;
+        this.side1Desc = side1Desc;
+        this.side2 = side2;
+        this.side2Desc = side2Desc;
         this.level = level
-        this.reviewIndex = reviewIndex
+        this.nextReview = reviewIndex
 
         // With the constructor, if can not be malformed
         this.malformed = false;
     }
 
     toString() {
-        // If the card is malformed, the malformed string is stored in this variable
-        if (this.malformed) return this.malformed;
+        return `🃟 Flaschcard: (${this.level}, ${this.nextReview}, ${this.deck}) (${this.side1Desc}: ${this.side1}) (${this.side2Desc}: ${this.side2})`
+    } 
 
-        // If the deck name in the flashcard does not exist as a Deck in the settings
-        const deckname = this.deck ? this.deck.name : 'No deck';
-        // This could only occur when user updated stringified card manually directly in the file.
-
-        return `FLASHCARD - ${deckname} - lvl ${this.level} - review index ${this.reviewIndex}: ${this.rectoDesc}->${this.recto} ? ${this.versoDesc}->${this.verso}`
+    static isStrAFlashcard(str: string): Boolean {
+        if (str.startsWith('🃟 Flaschcard:')
+            || str.startsWith('FLASHCARD - ')) // Handle deprecated version of flashcard learning. To be deleted in next versions
+            return true
+        return false
     }
 
-    static fromString(file: TFile, lineNb: number, decks: Array<Deck>, str: string): Flashcard {
-        try {
-            const elements = str
-                .replace('FLASHCARD - ', '')
-                .replace(' - lvl ', '///')
-                .replace(' - review index ', '///')
-                .replace(': ', '///')
-                .replace('->', '///')
-                .replace(' ? ', '///')
-                .replace('->', '///')
-                .trim()
-                .replace(' ### Malformed flashcard ###', '')
-                .split('///')
+    static fromString(file: TFile, lineNb: number, str: string): Flashcard {
 
-            const deck = decks.find(d => d.name == elements[0])
-            return new Flashcard(deck, elements[4], elements[3], elements[6], elements[5], parseInt(elements[1]), parseInt(elements[2]), file, lineNb)
+        // Handle deprecated version of flashcard learning. To be deleted in next versions
+        if (str.startsWith('FLASHCARD - ')) {
+            try {
+                const elements = str
+                    .replace('FLASHCARD - ', '')
+                    .replace(' - lvl ', '///')
+                    .replace(' - review index ', '///')
+                    .replace(': ', '///')
+                    .replace('->', '///')
+                    .replace(' ? ', '///')
+                    .replace('->', '///')
+                    .trim()
+                    .replace(' ### Malformed flashcard ###', '')
+                    .split('///')
 
-        } catch (e) {
-            // If the flashcard string is malformed, we add a flag string in the end, so the user knows it
-            const malformed = new Flashcard(undefined, '', '', '', '', -1, -1, file, lineNb)
-            malformed.malformed = str.replace(' ### Malformed flashcard ###', '') + ' ### Malformed flashcard ###';
-            return malformed;
+                const deck = elements[0]
+                // elements[4] => Recto => side1
+                // elements[3] => RectoDesc => side1Desc
+                // elements[6] => Verso => side2
+                // elements[5] => VersoDesc => side2Desc
+                // elements[1] => lvl => lvl
+                return new Flashcard(parseInt(elements[1]), 0, deck, elements[3], elements[4], elements[5], elements[6], file, lineNb)
+
+            } catch (e) {
+                // If the flashcard string is malformed, we add a flag string in the end, so the user knows it
+                const flashcard = new Flashcard(-2, -2, undefined, '', '', '', '', file, lineNb)
+                flashcard.malformed = '❌️' + str.replace(' ### Malformed flashcard ###', '')
+                return flashcard;
+            }
+        } else {
+            try {
+
+                let infos = str.replace('🃟 Flaschcard:', '').trim()
+                const metaPart = infos.substring(0, infos.indexOf(')') + 1).trim()
+                infos = infos.replace(metaPart, '').trim()
+                const side1Part = infos.substring(0, infos.indexOf(')') + 1).trim()
+                infos = infos.replace(side1Part, '').trim()
+                const side2Part = infos.substring(0, infos.indexOf(')') + 1).trim()
+
+                // Meta part
+                const metaSplited = metaPart.substring(1, metaPart.length - 1).split(',')
+                const lvl = parseInt(metaSplited[0].trim())
+                const reviewIndex = parseInt(metaSplited[1].trim())
+                const deck = metaSplited[2].trim()
+
+                // Side 1 part
+                const part1Splited = side1Part.substring(1, side1Part.length - 1).split(':')
+                const side1Desc = part1Splited[0].trim()
+                const side1 = part1Splited[1].trim()
+
+                // Side 2 part
+                const part2Splited = side2Part.substring(1, side2Part.length - 1).split(':')
+                const side2Desc = part2Splited[0].trim()
+                const side2 = part2Splited[1].trim()
+
+                return new Flashcard( lvl, reviewIndex, deck, side1Desc, side1, side2Desc, side2, file, lineNb)
+            } catch (e) {
+                // If the flashcard string is malformed, we add a flag string in the end, so the user knows it
+                const flashcard = new Flashcard(-2, -2, undefined, '', '', '', '', file, lineNb)
+                flashcard.malformed = '❌️' + str
+                return flashcard;
+            }
         }
+
     }
 
 
-    async reset() {
-        if (this.malformed) return;
-        this.level = 0;
-        this.reviewIndex = 0;
+    reset(): string {
+        this.level = -1;
+        this.nextReview = 0;
+
+        // Here we do not save the flashcard, in order to gain in performance:
+        // Places where we use this function uses a batch modification,
+        // in order to only update one file once, even if there is multiple flashcards in this file 
+
+        return this.toString()
     }
 
 
-    // When hitting 'Correct' button while reviewing a flashcard
-    async wasCorrect(vault: Vault) {
+    // When hitting 'Correct' button while reviewing a flashcard: change metadata of the card, and update file
+    async wasCorrect(vault: Vault, currentIndex: number) {
         this.level++;
-        this.reviewIndex = this.deck.reviewIndex + this.level;
+        this.nextReview = currentIndex + this.level;
 
         await this.save(vault)
     }
 
 
-    // When hitting 'Wrong' button while reviewing a flashcard
+    // When hitting 'Wrong' button while reviewing a flashcard: change metadata of the card, and update file
     async wasWrong(vault: Vault) {
         this.level = 0;
-        this.reviewIndex = this.deck.reviewIndex;
 
         await this.save(vault)
     }

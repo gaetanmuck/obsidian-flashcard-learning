@@ -171,6 +171,10 @@
     font-weight: bold;
 }
 
+.txt-center {
+    text-align: center;
+}
+
 .invisible {
     visibility: hidden;
 }
