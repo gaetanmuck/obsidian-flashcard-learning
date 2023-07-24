@@ -15,6 +15,8 @@
 
 ### Reviews durations
 
+![Reviews durations](https://github.com/gaetanmuck/obsidian-flashcard-learning/assets/26961057/aa5b9edb-da0f-44d3-a182-5f6397b7c0a1)
+
 #### Multiple reviews in a single day
 
 A review is not managed by time, but rather by the advancement in a review: if a review is short, then another can be started right after.
@@ -37,7 +39,11 @@ So when the flashcard is presented with the country name, what's expected is not
 In this plugin, there is the possibility to hint (actually, it is more like a description of what is expected) the answer.
 So that when a flashcard is presented, the expectation is clear. And if the descriptions are correctly set, it works both ways!
 
+![Expectation description](https://github.com/gaetanmuck/obsidian-flashcard-learning/assets/26961057/ef83759f-a127-4040-9703-752c0e066f68)
+
 ### Learning
+
+![Learning](https://github.com/gaetanmuck/obsidian-flashcard-learning/assets/26961057/620629bb-08d9-431c-93b7-98c55d4632f2)
 
 #### Best known, less shown
 
@@ -53,6 +59,8 @@ On the contrary, when a flashcard is wrongly answered, level will be reset to 0,
 
 #### Create cards with the helper
 
+![Create cards with the helper](https://github.com/gaetanmuck/obsidian-flashcard-learning/assets/26961057/2e319158-4eeb-48c6-b732-a5025ad59436)
+
 Flashcard can be created with the command `Create new Flashcard`.
 This will show a modal where information can be set, and create the flashcard where the cursor was placed on command execution.
 There is the possibility to help the creation of flashcards.
@@ -61,6 +69,8 @@ The properties are: `deck, side1, side1Desc, side2, side2Desc, level, nextReview
 On creation, the plugin also check if the properties `flashcard: true` is also set. This tells the plugin that there is flashcard(s) in this file, and that it needs to be parsed. If it does not find it, it creates it.
 
 #### Create cards manually
+
+![Create card manually](https://github.com/gaetanmuck/obsidian-flashcard-learning/assets/26961057/c61151db-5b1f-4aef-b6b6-8c005873a181)
 
 Once the syntax understood, flashcards can be created manually (or generating by a script for instance), and will be treated by the plugin according to provided information. In that scenario, the property `flashcard: true` has to be added also manually in the frontmatter YAML.
 
@@ -78,9 +88,14 @@ The plugin provided two inputs:
     - One ribbon icon, to have sum up of what the plugin is aware of and to start (or resume) reviews
     - One command that can be execute in a file (advised on a new line!) to easily create a flashcard
 
+![Commands - modal](https://github.com/gaetanmuck/obsidian-flashcard-learning/assets/26961057/acb3cb7f-212b-473b-a31c-3180c8327485)
+![Commands - ribbon](https://github.com/gaetanmuck/obsidian-flashcard-learning/assets/26961057/589c5c71-b630-465d-b70c-15e1481bfe82)
+
 ## Home screen
 
 See screen shots for more details.
+
+![Home screen](https://github.com/gaetanmuck/obsidian-flashcard-learning/assets/26961057/12c94f0d-39c6-4a0f-90b6-0a482476a55c)
 
 ## Thanks
 
