@@ -78,7 +78,7 @@ Once the syntax understood, flashcards can be created manually (or generating by
 
 When learning a field, it might have some times when the speed of creating new cards is much higher than the speed of learning, and it can be discouraging to have hundreds of things to learn. Even this can become counter productive because these hundreds of new information are not presented with the spaced presentation they deserve. 
 So to tackle this point, on creation, a card is set as "new", and will not be added to current review. 
-But, at the end of each review, according to the plugin setting, a certain number of new cards will be added to next review (randomnly chosen across all news).
+But, at the end of each review, according to the plugin setting, a certain number of new cards will be added to next review (randomly chosen across all news).
 So that the review size is kept at a reasonnable size. 
 When creating manually cards, do not forget to set level to -1 to enable this feature.
 
