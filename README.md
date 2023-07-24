@@ -80,8 +80,7 @@ The plugin provided two inputs:
 
 ## Home screen
 
-
-See screen shots for more hints.
+See screen shots for more details.
 
 ## Thanks
 
