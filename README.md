@@ -1,5 +1,7 @@
 # Flashcard Learning
 
+![GitHub all releases](https://img.shields.io/github/downloads/gaetanmuck/obsidian-flashcard-learning/total)
+
 ## Key features (TL;DR):
 
 - Make multiple reviews in a single day
